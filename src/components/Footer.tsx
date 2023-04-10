@@ -5,16 +5,19 @@ function Footer() {
 		<footer>
 			<p>
 				Original project by
-				<a href='https://twitter.com/megfdev'>@megfdev</a> and
-				<a href='https://twitter.com/Ivan00sto'>@Ivan00Sto</a>
+				<a
+					href='https://twitter.com/zg_dev'
+					style={{ color: 'var(--turquoise)' }}>
+					@zg_dev
+				</a>
 			</p>
 
 			<p>
 				Refactored by
 				<a
-					href='https://twitter.com/zg_dev'
+					href='https://github.com/Kypac-Max'
 					style={{ color: 'var(--turquoise)' }}>
-					@zg_dev
+					Kypac-Max
 				</a>
 			</p>
 		</footer>
