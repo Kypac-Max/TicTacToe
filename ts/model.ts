@@ -1,6 +1,19 @@
-//store
+import type { Player, GameState, GameStatus, Move } from './types';
 
-const initialValue = {
+type PlayerWithWins = Player & { wins: number };
+
+export type DerivedStats = {
+	playerWithStats: PlayerWithWins[];
+	ties: number;
+};
+
+export type DerivedGame = {
+	currentGameMoves: Move[];
+	currentPlayer: Player;
+	status: GameStatus;
+};
+
+const initialValue: GameState = {
 	currentGameMoves: [],
 	history: {
 		currentRoundGames: [],
@@ -8,14 +21,17 @@ const initialValue = {
 	},
 };
 
+type SaveStateCb = (prevState: GameState) => GameState;
+
 export default class Model extends EventTarget {
-	constructor(key, players) {
+	constructor(
+		private readonly storageKey: string,
+		private readonly players: Player[]
+	) {
 		super();
-		this.storageKey = key;
-		this.players = players;
 	}
 
-	get stats() {
+	get stats(): DerivedStats {
 		const state = this.#getState();
 
 		return {
@@ -35,7 +51,7 @@ export default class Model extends EventTarget {
 		};
 	}
 
-	get game() {
+	get game(): DerivedGame {
 		const state = this.#getState();
 		const currentPlayer = this.players[state.currentGameMoves.length % 2];
 		const winningPatterns = [
@@ -64,17 +80,17 @@ export default class Model extends EventTarget {
 
 		return {
 			currentGameMoves: state.currentGameMoves,
+			currentPlayer,
 			status: {
 				isComplete:
 					winner != null || state.currentGameMoves.length === 9,
 				winner,
 			},
-			currentPlayer,
 		};
 	}
 
-	playerMove(squareId) {
-		const stateClone = structuredClone(this.#getState());
+	playerMove(squareId: number) {
+		const stateClone = structuredClone(this.#getState()) as GameState;
 
 		stateClone.currentGameMoves.push({
 			squareId,
@@ -85,12 +101,12 @@ export default class Model extends EventTarget {
 	}
 
 	reset() {
-		const stateClone = structuredClone(this.#getState());
-		const { status, moves } = this.game;
+		const stateClone = structuredClone(this.#getState()) as GameState;
+		const { status, currentGameMoves } = this.game;
 
 		if (status.isComplete) {
 			stateClone.history.currentRoundGames.push({
-				moves,
+				currentGameMoves,
 				status,
 			});
 		}
@@ -102,7 +118,7 @@ export default class Model extends EventTarget {
 
 	newRound() {
 		this.reset();
-		const stateClone = structuredClone(this.#getState());
+		const stateClone = structuredClone(this.#getState()) as GameState;
 		stateClone.history.allGames.push(
 			...stateClone.history.currentRoundGames
 		);
@@ -112,10 +128,10 @@ export default class Model extends EventTarget {
 
 	#getState() {
 		const item = window.localStorage.getItem(this.storageKey);
-		return item ? JSON.parse(item) : initialValue;
+		return item ? (JSON.parse(item) as GameState) : initialValue;
 	}
 
-	#saveState(stateOrFn) {
+	#saveState(stateOrFn: GameState | SaveStateCb) {
 		const prevState = this.#getState();
 		let newState;
 

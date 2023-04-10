@@ -1,9 +1,8 @@
-//app
-
+import type { Player } from './types.js';
 import Model from './model.js';
 import View from './view.js';
 
-const players = [
+const players: Player[] = [
 	{
 		id: 1,
 		name: 'Player 1',
@@ -48,7 +47,6 @@ function init() {
 		if (existingMove) return;
 
 		model.playerMove(+square.id);
-
 	});
 }
 
