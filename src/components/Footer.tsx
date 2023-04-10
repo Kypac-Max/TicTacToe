@@ -7,7 +7,7 @@ function Footer() {
 				Original project by
 				<a
 					href='https://twitter.com/zg_dev'
-					style={{ color: 'var(--turquoise)' }}>
+					style={{ color: 'var(--yellow)' }}>
 					@zg_dev
 				</a>
 			</p>
