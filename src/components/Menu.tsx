@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './Menu.css';
 
 type Props = {
-	onAction(action: 'reset' | 'new-round'): void;
+	onAction(action: 'reset' | 'new-round' | 'player-vs-bot'): void;
 };
 
 function Menu({ onAction }: Props) {
@@ -34,6 +34,13 @@ function Menu({ onAction }: Props) {
 							setMenuOpen((prev) => !prev);
 						}}>
 						New Round
+					</button>
+					<button
+						onClick={() => {
+							onAction('player-vs-bot');
+							setMenuOpen((prev) => !prev);
+						}}>
+						Player vs Bot
 					</button>
 				</div>
 			)}

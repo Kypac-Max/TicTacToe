@@ -4,6 +4,7 @@ import Modal from './components/Modal';
 import type { GameState, Player } from './types';
 import useLocalStorage from './useLocalStorage';
 import { deriveGame, deriveStats } from './utils';
+import { useState } from 'react';
 
 // tsc convert all tsx to js files
 // npm run build to convert all to js in the public folder
@@ -17,6 +18,8 @@ export default function App() {
 		},
 	});
 
+	const [gameVsBot, setGameVsBot] = useState(false);
+
 	const game = deriveGame(state);
 	const stats = deriveStats(state);
 
@@ -29,6 +32,27 @@ export default function App() {
 				player,
 			});
 
+			if (gameVsBot && stateClone.currentGameMoves.length !== 9) {
+				const moves = stateClone.currentGameMoves.map(
+					(element) => element.squareId
+				);
+				const availableMoves = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(
+					(el) => !moves.includes(el)
+				);
+				const randomMove = Math.floor(
+					Math.random() * availableMoves.length
+				);
+				const bot = {
+					id: 2,
+					name: 'Player 2',
+					iconClass: 'fa-o',
+					colorClass: 'yellow',
+				};
+				stateClone.currentGameMoves.push({
+					squareId: availableMoves[randomMove],
+					player: bot,
+				});
+			}
 			return stateClone;
 		});
 	}
@@ -67,7 +91,15 @@ export default function App() {
 					<p>{game.currentPlayer.name}, you're up!</p>
 				</div>
 				<Menu
-					onAction={(action) => resetGame(action === 'new-round')}
+					onAction={(action) => {
+						if (action !== 'player-vs-bot') {
+							setGameVsBot(false);
+							resetGame(action === 'new-round');
+						} else {
+							resetGame(true);
+							setGameVsBot(true);
+						}
+					}}
 				/>
 				{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((squareId) => {
 					const existingMove = game.currentGameMoves.find(
